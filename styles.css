@@ -1,0 +1,20 @@
+#title-block-header {
+    margin-block-end: -50px !important;
+}
+
+.quarto-title-block {
+    padding-bottom:0px;
+    margin-bottom: 0px;
+
+}
+.quarto-title-banner {
+    margin-bottom: 0px;
+    padding-bottom:0px;
+}
+.page-full {
+    margin-bottom: 0px;
+    padding-bottom: 8px;
+} 
+.quarto-title-meta {
+    display: none;
+}
