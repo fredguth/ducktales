@@ -1,0 +1,7 @@
+shiny
+pandas
+itables
+shinyswatch
+micropip
+ipywidgets
+duckdb

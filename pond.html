@@ -105,9 +105,17 @@ background: #FAF7F4;
 <div class="column-screen-inset">
 <pre class="shinylive-python" data-engine="python"><code>#| standalone: true
 #| viewerHeight: 800
-
+# import micropip
+# await micropip.install("itables")
+import urllib.request
+from pathlib import Path
 from typing import List, Optional
 from shiny import App, Inputs, Outputs, Session, reactive, render, ui, module
+from itables.shiny import DT
+from itables import options, show, init_notebook_mode
+
+# import duckdb 
+
 # from htmltools import HTML,li, a
 # ============================================================
 # toggleButtons module
