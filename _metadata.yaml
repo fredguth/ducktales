@@ -1,12 +1,9 @@
-comments:
-  giscus:
-    repo: quarto-dev/quarto-web
-    category: Blog
-title-block-banner: "#EDF3F9"
+# comments:
+#   giscus:
+#     repo: quarto-dev/quarto-web
+#     category: Blog
+title-block-banner: "#FAF7F4"
 title-block-banner-color: black
 toc-location: left
-# format:
-#   html:
-#     include-after-body:
-#       - ../signup.html
+
 search: false

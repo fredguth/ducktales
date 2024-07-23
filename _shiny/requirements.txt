@@ -1,0 +1,7 @@
+shiny
+pandas
+itables
+shinyswatch
+micropip
+ipywidgets
+https://duckdb.github.io/duckdb-pyodide/wheels/duckdb-1.0.0-cp312-cp312-pyodide_2024_0_wasm32.whl

@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="versão 1.12.251">
+<meta name="description" content="Base de dados do sistema SIOPS">
 
 <title>SIOPS</title>
 <style>
@@ -53,7 +53,7 @@ ul.task-list li input[type="checkbox"] {
 
       .quarto-title-block .quarto-title-banner {
         color: black;
-background: #EDF3F9;
+background: #FAF7F4;
       }
 </style>
 
@@ -67,10 +67,10 @@ background: #EDF3F9;
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
       <h1 class="title">SIOPS</h1>
-            <p class="subtitle lead">Base de dados do Sistema SIOPS</p>
+            <p class="subtitle lead">br_ms.siops (v.20240702)</p>
                   <div>
         <div class="description">
-          <p>versão 1.12.251</p>
+          <p>Base de dados do sistema SIOPS</p>
         </div>
       </div>
                           <div class="quarto-categories">
@@ -108,8 +108,7 @@ background: #EDF3F9;
 
 from typing import List, Optional
 from shiny import App, Inputs, Outputs, Session, reactive, render, ui, module
-
-
+# from htmltools import HTML,li, a
 # ============================================================
 # toggleButtons module
 # ============================================================
@@ -121,12 +120,12 @@ def toggleButtons_ui() -&gt; ui.TagChild:
 
 @module.server
 def toggleButtons_server(input: Inputs, output: Outputs, session: Session, choices: List[str], selected=None):
-    selected = selected or reactive.value(choices[0])
+    selected = selected or reactive.value("")
     @render.ui
     def menu():
         buttons = []
         for choice in choices:
-            klass = "btn-secondary" if selected() == choice else "btn-outline-secondary"
+            klass = "btn-secondary" if (selected and (selected() == choice)) else "btn-outline-secondary"
             buttons.append(ui.input_action_button(f"menubtn_{choices.index(choice)}", f"{choice}", class_=klass))
         return ui.div(*buttons, class_="d-grid gap-2")
 
@@ -156,43 +155,60 @@ def tableShell_server(input, output, session, selected=None):
     @render.ui
     def tableShell():
         t = f"Tabela: {selected()}"
-        panels = ["Baixar", "Explorar", None, None, "Documentação", "Linhagem", "Qualidade", "Ficha Técnica", None, None, None, None, None]
+        panels = ["Baixar", "Explorar", None, None, "Documentação", "Qualidade", "Ficha Técnica", None, None, None, None, None]
+        # API, Linhagem
         children = [ui.nav_panel(c, f"Panel {c} content") if c else ui.nav_spacer() for c in panels]
         sb = ui.sidebar("tbl_sb", open="closed", title=t, position="right")
         return ui.navset_card_underline(id="tbl_card", selected="Explorar", sidebar=sb, title=t, *children)
-
-
-
 
 # =============================================================================
 # App 
 # =============================================================================
 
+panels = [ui.accordion_panel(p, p) for p in ["Entradas/Saídas", "Reúsos", "Discussão"]]
 
-panels = [ui.accordion_panel(p, p) for p in ["Entradas", "Saídas", "Reúsos", "Discussão"]]
-tbl_panel = ui.accordion_panel("Tabelas", toggleButtons_ui("main_sidebar"))
-accordion = ui.accordion(tbl_panel, *panels)
+# inout = ui.accordion_panel("Entradas/Saídas", toggleButtons_ui("menuInOut"))
+tabelas = ui.accordion_panel("Tabelas", toggleButtons_ui("menuTabelas"))
+ficha_tecnica = ui.accordion_panel("Ficha Técnica","Ficha")
+accordion = ui.accordion(tabelas, ficha_tecnica)
+# accordion2 = ui.accordion(ficha_tecnica)
 
-app_ui = ui.page_sidebar(        
-    ui.sidebar(toggleButtons_ui("menu1"), id="main_sb", open="open", title="Base: SIOPS", position="left"),
-    tableShell_ui(id="shell"),
+app_ui = ui.page_sidebar(
+    # ui.sidebar( toggleButtons_ui("menuOverview"), accordion1, toggleButtons_ui("menuInOut"), accordion2, id="main_sb", open="open", title="Base: SIOPS", position="left"),
+    ui.sidebar( toggleButtons_ui("menuOverview"), accordion,  id="main_sb", open="open", title="Base: SIOPS", position="left"),
+    # tableShell_ui(id="table_shell"),
+    ui.output_ui("shell"),
     ui.tags.style(".bslib-sidebar-layout &gt; .main { padding: 0px; padding-top: 0px;}"),
     ui.tags.style(".card { --bs-card-border-radius: 0px 0px 8px 0px}"),
 )
 
 
 def server(input, output, session):
+    tables = ["Entes", "Receitas", "Despesas"]
+    selected = reactive.value(tables[0])    
+    # selected = reactive.value("Visão Geral")    
+    toggleButtons_server("menuOverview", ["Visão Geral"], selected)
+    toggleButtons_server("menuTabelas", tables, selected)
+    toggleButtons_server("menuInOut", ["Entradas", "Saídas"], selected)
+    tableShell_server(id="table_shell", selected=selected)
     
-    choices = ["Entes", "Receitas", "Despesas"]
-    selected = reactive.value(choices[0])
-    
-    toggleButtons_server("menu1", choices, selected)
-    tableShell_server(id="shell", selected=selected)
-
+    @render.ui
+    def shell():
+        if selected and (selected() in tables): return tableShell_ui(id="table_shell")
+        else: return ui.card(  
+            ui.card_header(f"{selected()}"),
+            ui.p("Card  body"),
+            id="visaogeral"
+        ), 
+        
+    # @react.effect
+    # @render.ui
+    # def shell(id="shell"):
+    #     return 
+        # else: return "oi"
+            # return ui.card(id="base_shell", title="Visão Geral")
     
 app = App(app_ui, server)
-
-
 </code></pre>
 </div>
 
@@ -618,10 +634,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<script src="https://giscus.app/client.js" data-repo="quarto-dev/quarto-web" data-repo-id="MDEwOlJlcG9zaXRvcnkzNDc2MzMzNTg=" data-category="Blog" data-category-id="DIC_kwDOFLh2zs4CBQQq" data-mapping="title" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
-</script>
-<input type="hidden" id="giscus-base-theme" value="light">
-<input type="hidden" id="giscus-alt-theme" value="dark">
 </div> <!-- /content -->
 
 
