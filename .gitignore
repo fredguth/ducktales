@@ -1,3 +1,7 @@
 /.quarto/
 __pycache__/
 *.db
+_site/
+_build/
+_pond_files
+
